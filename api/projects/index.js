@@ -6,7 +6,7 @@ const projects = require(APP_PATH + '/models/projects');
 router.use(function (req, res, next) {
     if (res.locals.user.role !== 1){
         return res.status(403).json({
-            'message': 'Developer can not delete project'
+            'message': 'Developer can not accept this resource'
         });
     }
 
@@ -18,9 +18,18 @@ router.use(function (req, res, next) {
  * POST /Create project
  */
 router.post('/', function(req, res) {
-    let title = req.body.title, detail = req.body.details, status = req.body.status;
-    projects.create(title, detail, status).then((result) => {
-
+    const keys = ['title', 'details', 'status'];
+    
+    const key = keys.find(key => !req.body[key]);
+    
+    if(key) {
+        return res.status(403).json({
+            'message': `${key} parametr is missing`
+        });
+    }
+    
+    const { title, details, status } = req.body;
+    projects.create(title, details, status).then((result) => {
         res.status(201).json({status: result.affectedRows ? 'Project Created' : 'error'})
     });
 });
@@ -40,6 +49,14 @@ router.get('/', function(req, res) {
  * GET / Project By Id
  */
 router.get('/:id', function(req, res) {
+    const id = req.params.id;
+    
+    if(!Number(id)) {
+        return res.status(403).json({
+            'message': 'Invalid id'
+        });
+    }
+    
     projects.getById(req.params.id).then((result) => {
         res.json(result)
     });
@@ -50,7 +67,23 @@ router.get('/:id', function(req, res) {
  * PUT / Update Project
  */
 router.put('/:id', function(req, res) {
-    let id = req.params.id, title = req.body.title, detail = req.body.details, status = req.body.status;
+    const id = req.params.id;
+    
+    if(!Number(id)) {
+        return res.status(403).json({
+            'message': 'Invalid id'
+        });
+    }
+    
+    const keys = ['title', 'details', 'status'];
+    
+    const key = keys.find(key => !req.body[key]);
+    
+    if(key) {
+        return res.status(403).json({
+            'message': `${key} parametr is missing`
+        });
+    }
 
     projects.update(title, detail, status, id).then((result) => {
 
@@ -63,7 +96,15 @@ router.put('/:id', function(req, res) {
  * DELETE / Delete Project
  */
 router.delete('/:id', function(req, res) {
-    projects.delete(req.params.id).then((result) => {
+    const id = req.params.id;
+    
+    if(!Number(id)) {
+        return res.status(403).json({
+            'message': 'Invalid id'
+        });
+    }
+    
+    projects.delete(id).then((result) => {
         res.json({status: result ? 'Project Deleted' : 'project does not exist'});
     });
 });
