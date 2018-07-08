@@ -6,7 +6,7 @@ const DEVS_PROJECTS_TABLE = '`developer_projects`';
 class Projects {
 	static getAll() {
 		return new Promise((resolve, reject) => {
-			connection.query(`SELECT * FROM ${TABLE} ORDER BY id`, [], (err, res) => {
+			connection.query(`SELECT * FROM ${TABLE} ORDER BY id`, (err, res) => {
 				if(err) throw err;
 				let data = res || null;
 				data ? resolve(data) : reject(null);
@@ -25,7 +25,7 @@ class Projects {
 	}
 
 	static getDeveloperActive(dev_id) {
-		var sql = `SELECT * FROM ${TABLE} AS t JOIN ${DEVS_PROJECTS_TABLE} AS t1 ON t.id = t1.projectId WHERE t1.developerId = ? AND t.status = 1`;
+		let sql = `SELECT * FROM ${TABLE} AS t JOIN ${DEVS_PROJECTS_TABLE} AS t1 ON t.id = t1.projectId WHERE t1.developerId = ? AND t.status = 1`;
 		return new Promise((resolve, reject) => {
 			connection.query(sql, [dev_id], (err, res) => {
 				if(err) throw err;
@@ -37,10 +37,10 @@ class Projects {
 		});
 	}
 
-	static create(title, details, status) {
-		var sql = `INSERT INTO ${TABLE} SET title = ?, details = ?, status = ?`;
+	static create(title, details) {
+		let sql = `INSERT INTO ${TABLE} SET title = ?, details = ?`;
 		return new Promise((resolve, reject) => {
-			connection.query(sql, [title, details, status], (err, res) => {
+			connection.query(sql, [title, details], (err, res) => {
 				if(err) throw err;
 				resolve(res);
 			});
@@ -48,20 +48,20 @@ class Projects {
 	}
 
 	static delete(id) {
-		var sql = `DELETE FROM ${TABLE} WHERE id = ?`;
+		let sql = `DELETE FROM ${TABLE} WHERE id = ?`;
 		return new Promise((resolve, reject) => {
 			connection.query(sql, [id], (err, res) => {
 				if(err) throw err;
-				console.log(res.affectedRows)
-				res.affectedRows ? resolve(res.affectedRows) : reject(null);
+
+				resolve(res.affectedRows)
 			});
 		});
 	}
 
-	static update(id, title, details, status) {
-		var sql = `UPDATE ${TABLE} SET title = ?, details = ?, status = ? WHERE id = ?`;
+	static update(id, title = '`title`', details = '`details`') {
+		let sql = `UPDATE ${TABLE} SET title = ?, details = ? WHERE id = ?`;
 		return new Promise((resolve, reject) => {
-			connection.query(sql, [id, title, details, status] ,  (err, res) => {
+			connection.query(sql, [title, details, id] ,  (err, res) => {
 				if(err) throw err;
 				
 				res.affectedRows ? resolve(res.affectedRows) : reject(null);
@@ -70,7 +70,7 @@ class Projects {
 	}
 
 	static getDeveloperFromProject(developerId, projectd){
-	    var sql = `SELECT * FROM ${DEVS_PROJECTS_TABLE} WHERE developerId = ? AND projectId = ?`;
+	    let sql = `SELECT * FROM ${DEVS_PROJECTS_TABLE} WHERE developerId = ? AND projectId = ?`;
         return new Promise((resolve, reject) => {
             connection.query(sql, [developerId, projectd], (err, res) => {
                 if(err) throw err;
@@ -80,22 +80,24 @@ class Projects {
     }
 
 	static addDevToProject(projectId, developerId){
-        var sql = `INSERT ${DEVS_PROJECTS_TABLE} SET developerId = ?, projectId = ?`;
+        let sql = `INSERT ${DEVS_PROJECTS_TABLE} SET ?`;
         return new Promise((resolve, reject) => {
             Projects.getDeveloperFromProject(developerId, projectId).then((result) => {
                 if (!result.length){
-                    connection.query(sql, [developerId, projectId], (err, res) => {
+                    return connection.query(sql, {developerId, projectId}, (err, res) => {
                         if(err) throw err;
                         resolve(res.affectedRows);
                     });
-                } reject(null);
+                }
+
+                reject(null);
             });
         });
     }
 
     static removeDevFromProject(projectId, developerId){
 
-        var sql = `DELETE FROM ${DEVS_PROJECTS_TABLE} WHERE developerId = ? AND projectId = ?`;
+        let sql = `DELETE FROM ${DEVS_PROJECTS_TABLE} WHERE developerId = ? AND projectId = ?`;
         return new Promise((resolve, reject) => {
             connection.query(sql, [developerId, projectId], (err, res) => {
                 if(err) throw err;

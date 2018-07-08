@@ -2,6 +2,7 @@ const express= require('express');
 const router = express.Router();
 
 const projects = require(APP_PATH + '/models/projects');
+const keys = ['title', 'details'];
 
 router.use(function (req, res, next) {
     if (res.locals.user.role !== 1){
@@ -13,13 +14,7 @@ router.use(function (req, res, next) {
     next();
 });
 
-
-/**
- * POST /Create project
- */
 router.post('/', function(req, res) {
-    const keys = ['title', 'details', 'status'];
-    
     const key = keys.find(key => !req.body[key]);
     
     if(key) {
@@ -28,8 +23,8 @@ router.post('/', function(req, res) {
         });
     }
     
-    const { title, details, status } = req.body;
-    projects.create(title, details, status).then((result) => {
+    const { title, details } = req.body;
+    projects.create(title, details).then((result) => {
         res.status(201).json({status: result.affectedRows ? 'Project Created' : 'error'})
     });
 });
@@ -75,8 +70,6 @@ router.put('/:id', function(req, res) {
         });
     }
     
-    const keys = ['title', 'details', 'status'];
-    
     const key = keys.find(key => !req.body[key]);
     
     if(key) {
@@ -85,7 +78,8 @@ router.put('/:id', function(req, res) {
         });
     }
 
-    projects.update(title, detail, status, id).then((result) => {
+    const { title, details } = req.body;
+    projects.update(id, title, details).then((result) => {
 
         res.json({status: result ? 'Project Updated' : 'project does not exist'});
     });
@@ -114,20 +108,53 @@ router.delete('/:id', function(req, res) {
  * POST / Add developer to project
  */
 router.post('/:projId/dev/:devId', function(req, res) {
-    let projectId = req.params.projId, developerId = req.params.devId;
+    const 
+    	projectId = req.params.projId, 
+    	developerId = req.params.devId;
+
+    if(!Number(projectId)) {
+    	return res.status(403).json({
+    		message: 'Invalid project id'
+    	});
+    }
+    
+    if(!Number(developerId)) {
+    	return res.status(403).json({
+    		message: 'Invalid developer id'
+    	});
+    }
+
     projects.addDevToProject(projectId, developerId).then((result) => {
         console.log(result);
         res.json({status: result ? 'Developer added to project' : 'No such developer or project'});
-    });
+    }, () => res.json({
+        message: 'Developer already on project'
+    }));
 });
 
 /**
  * POST / Remove developer to project
  */
 router.delete('/:projId/dev/:devId', function(req, res) {
-    let projectId = req.params.projId, developerId = req.params.devId;
+    const 
+    	projectId = req.params.projId, 
+    	developerId = req.params.devId;
+
+    if(!Number(projectId)) {
+    	return res.status(403).json({
+    		message: 'Invalid project id'
+    	});
+    }
+    
+    if(!Number(developerId)) {
+    	return res.status(403).json({
+    		message: 'Invalid developer id'
+    	});
+    }
+
     projects.removeDevFromProject(projectId, developerId).then((result) => {
         res.json({status: result ? 'Developer removed from project' : 'No such developer in project'});
     });
 });
+
 module.exports = router;
