@@ -11,7 +11,6 @@ const Encryption = require(`${APP_PATH}/models/Encryption`);
 const authCheckingMiddleware = require(`${APP_PATH}/middlewares/authCheckingMiddleware`);
 
 router.post('/auth', function (req, res) {
-
 	const
 		header = req.headers['authorization'] || '',
 		token = header.split(/\s+/).pop() || '',
