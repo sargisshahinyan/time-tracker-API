@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const routes = ['/reports', '/projects', '/users', '/developers'];
+const routes = ['/reports', '/projects', '/developers'];
 
 
 // models
@@ -33,12 +33,6 @@ router.post('/auth', function (req, res) {
 });
 
 router.use(authCheckingMiddleware);
-
-router.get('/users', function (req, res) {
-	res.json({
-		message: "Hello"
-	});
-});
 
 routes.forEach(route => router.use(route, require(`.${route}`)));
 
