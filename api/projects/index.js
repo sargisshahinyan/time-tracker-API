@@ -5,7 +5,7 @@ const projects = require(APP_PATH + '/models/projects');
 const keys = ['title', 'details'];
 
 router.use(function (req, res, next) {
-    if (res.locals.user.role !== 1){
+    if (res.locals.user.role !== roles.manager){
         return res.status(403).json({
             'message': 'Developer can not accept this resource'
         });
