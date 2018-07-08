@@ -7,6 +7,7 @@ const logger = require('morgan');
 const app = express();
 
 global.APP_PATH = path.resolve(__dirname);
+global.roles = {manager: 1, developer: 0};
 const helpers = require(APP_PATH + '/libs/helpers');
 
 app.use(logger('dev'));
