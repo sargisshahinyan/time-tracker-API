@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const routes = ['/reports', '/projects', '/users', '/developers'];
+const roles = {manager: 1, developer: 0};
 
 // models
 const Users = require(`${APP_PATH}/models/users`);
