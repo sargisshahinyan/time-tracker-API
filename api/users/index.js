@@ -44,4 +44,9 @@ router.get('/:id', function(req, res) {
 	Users.getUser(id).then(user => res.json(user), err => res.status(404).json(err));
 });
 
+router.get('/developers', function(req, res) {
+	console.log("FGFGFg")
+	Users.getDevelopers().then(user => res.json(user), err => res.status(404).json(err));
+});
+
 module.exports = router;
