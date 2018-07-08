@@ -83,6 +83,17 @@ class Users {
 		});
 	}
 
+	static getDevelopers(){
+		return new Promise((resolve, reject) => {
+			connection.query(`SELECT u.name, p.title FROM users as u LEFT JOIN developer_projects as dp on dp.developerId = u.id LEFT JOIN projects as p on p.id = dp.projectId
+WHERE u.role = ?`, [roles.developer], (err, res) => {
+				if(err) throw err;
+				let data = res || null;
+				data ? resolve(data) : reject(null);
+			});
+		});
+	}
+
 }
 
 module.exports = Users;

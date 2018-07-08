@@ -25,7 +25,7 @@ router.get('/', function (req, res, next) {
 	
 	let promise = Promise.resolve();
 
-	if(user.role !== 1) {
+	if(user.role !== roles.manager) {
 		data.userId = user.id;
 		
 		if('projectId' in data) {

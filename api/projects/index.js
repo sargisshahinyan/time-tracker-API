@@ -25,7 +25,7 @@ router.get('/', function(req, res) {
 });
 
 router.use(function (req, res, next) {
-    if (res.locals.user.role !== 1){
+    if (res.locals.user.role !== roles.manager){
         return res.status(403).json({
             'message': 'Developer can not accept this resource'
         });
