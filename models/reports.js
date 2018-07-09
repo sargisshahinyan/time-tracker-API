@@ -37,7 +37,7 @@ class Reports {
 	
 	static getReport(id){
 		return new Promise((resolve) => {
-			connection.query(`SELECT id, note, spentTime FROM ${REPORTS_TABLE} WHERE id = ?`, [id], (err, reports) => {
+			connection.query(`SELECT * FROM ${REPORTS_TABLE} WHERE id = ?`, [id], (err, reports) => {
 				if(err) throw err;
 				
 				let report = reports[0] || null;
